@@ -1,0 +1,38 @@
+program
+
+c | b : string;
+
+carmine = "ciao\0": string;
+
+def x(a, b : int) : int
+{
+    x := 20;
+    return a + b;
+}
+
+x | y = 10 : int;
+
+a : 30.50;
+
+def f(a, b : string) : string
+{
+
+    return a + b;
+
+}
+
+
+begin
+boh = "ciao guido" : string;
+guido = boh + "ciao carmine": string;
+x = 40 : int;
+d : int;
+x | y << ;
+a := a + 20;
+d := x(1,2);
+guido := f(boh, carmine);
+if (x < y) then {
+"I valori di x e y sono:", x, " ", y !>> ;
+}
+x(1, 2);
+end

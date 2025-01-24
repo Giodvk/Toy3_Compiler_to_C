@@ -1,0 +1,34 @@
+program
+
+x | y : int;
+
+def guido ( a, b : int; c : double): int {
+
+    return a + b + x + y;
+
+}
+
+def mul ( a, b : int) : int {
+
+    errata(a,b,10+2,"ciao", "lollo");
+    return a * b;
+
+}
+
+def errata (a, b , c : int; x, y : string) {
+
+    a := b + x;
+    return x + y;
+
+}
+
+begin
+
+a | b = 30 : int;
+
+if (x > 10) then{
+    a := mul(a,b);
+}
+
+
+end

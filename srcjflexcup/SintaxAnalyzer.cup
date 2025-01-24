@@ -1,0 +1,243 @@
+import java_cup.runtime.*;
+import classNode.Expression.*;
+import classNode.DeclarationNode.*;
+import classNode.jumpStatement.*;
+import classNode.main.*;
+import classNode.Stat.*;
+import java.util.ArrayList;
+
+
+parser code {:
+
+    public void syntax_error(Symbol cur_token){
+        System.err.println("Syntax error at line: "+ (cur_token.left + 1) + " column " + (cur_token.right + 1));
+    }
+
+:};
+
+
+/* Terminals token ritornati dal lexerAnalyzer*/
+terminal PROGRAM, BEGIN, END, SEMI, COLON, INT, BOOL, DOUBLE, STRING, CHAR,
+         COMMA, DEF, LPAR, RPAR, LBRAC, RBRAC, IN, OUT, OUTNL, PLUS, MINUS,
+         UMINUS, TIMES, DIV, RETURN, ASSIGN, ASSIGNDECL, IF, THEN, WHILE, DO, ELSE, GT,
+         GE, LT, LE, EQ, NE, AND, OR, NOT, REF, PIPE, UAND;
+
+terminal String ID, STRING_CONST;
+terminal int INT_CONST;
+terminal double DOUBLE_CONST;
+terminal boolean TRUE, FALSE;
+terminal char CHAR_CONST;
+
+nonterminal Object TypeOrConstant;
+nonterminal expressionNode Expr, FunCallExpr;
+nonterminal constantExpression Constant;
+nonterminal String ArithOp, BoolOp, RelOp, Type, OptType;
+nonterminal ArrayList<expressionNode> Exprs;
+nonterminal ArrayList<identifierExpression> Vars;
+nonterminal statOp Stat, FunCallStat;
+nonterminal ArrayList<statOp> Statements;
+nonterminal BodyOp Body;
+nonterminal PvarOp PVar;
+nonterminal ArrayList<PvarOp> PVars;
+nonterminal ParDeclOp ParDecl;
+nonterminal ArrayList<ParDeclOp> ParDecls;
+nonterminal DefDeclOp DefDecl;
+nonterminal ArrayList<varOptInitOp> VarsOptInit;
+nonterminal varDeclOp VarDecl;
+nonterminal ArrayList<varDeclOp> VarDecls;
+nonterminal ArrayList<DeclOp> Decls;
+nonterminal ProgramOp Programma;
+
+
+/* Precedenze operatori logici */
+precedence left OR;
+precedence left AND;
+precedence right NOT;
+
+/* Precedenze operatori relazionali */
+precedence left EQ, NE, LT, LE, GT, GE;
+
+/* Precedenze operatori aritmetici */
+precedence left PLUS, MINUS;
+precedence left TIMES, DIV;
+precedence left UMINUS, LPAR, RPAR, UAND;
+
+
+
+
+
+Programma ::=  PROGRAM Decls:decls BEGIN VarDecls:varProgram Statements:stateProgram END {: BeginEndOp mainBody = new BeginEndOp(varProgram, stateProgram);
+                                                                                            RESULT = new ProgramOp(decls, mainBody); :}
+               ;
+
+Decls ::= VarDecl:varDecl Decls:args {: args.add(0, varDecl);
+                                       RESULT = args; :}
+      | DefDecl:defDecl Decls:args {: args.add(0, defDecl);
+                                      RESULT = args; :}
+      | {: RESULT = new ArrayList<DeclOp>(); :}
+      ;
+
+VarDecls ::= VarDecls:vars VarDecl:var {: vars.add(var);
+                                         RESULT = vars; :}
+         | {: RESULT = new ArrayList<varDeclOp>(); :}
+         ;
+
+
+
+VarDecl ::= VarsOptInit:vars COLON TypeOrConstant:type SEMI {: RESULT = new varDeclOp(vars, type); :};
+
+VarsOptInit::= ID:id PIPE VarsOptInit:args {:identifierExpression var = new identifierExpression(id, idleft + 1, idright + 1);
+                                             varOptInitOp init = new varOptInitOp(var, null);
+                                             args.add(0, init);
+                                             RESULT = args; :}
+
+	   | ID:id ASSIGNDECL Expr:expr PIPE VarsOptInit:inits {: identifierExpression var = new identifierExpression(id, idleft + 1, idright + 1);
+                                                             varOptInitOp init = new varOptInitOp(var, expr);
+                                                             inits.add(0, init);
+                                                             RESULT = inits; :}
+	   | ID:id {:identifierExpression var = new identifierExpression(id, idleft + 1, idright + 1);
+              varOptInitOp init = new varOptInitOp(var, null);
+              ArrayList<varOptInitOp> varsInit = new ArrayList<varOptInitOp>();
+              varsInit.add(0, init);
+              RESULT = varsInit; :}
+	   | ID:id ASSIGNDECL Expr:expr {: identifierExpression var = new identifierExpression(id, idleft + 1, idright + 1);
+                                      varOptInitOp init = new varOptInitOp(var, expr);
+	                                  ArrayList<varOptInitOp> varsInit = new ArrayList<varOptInitOp>();
+	                                  varsInit.add(0, init);
+	                                  RESULT = varsInit; :}
+       ;
+
+TypeOrConstant ::= Type:type {: RESULT = type; :}
+	       | Constant:value {: RESULT = value.getConstant(); :}
+	       ;
+
+Type ::= INT:type {: RESULT = "integer"; :}
+           |  BOOL:type {: RESULT = "bool"; :}
+           |  DOUBLE:type  {: RESULT = "double"; :}
+           | STRING:type {: RESULT = "string"; :}
+           | CHAR:type {: RESULT = "char"; :}
+        ;
+
+Constant ::= TRUE:value {:RESULT = new constantExpression(value, "true", valueleft+1, valueright+1);:}
+          | FALSE:value {: RESULT = new constantExpression(value, "false", valueleft+1, valueright+1);:}
+          | INT_CONST:value {:RESULT = new constantExpression(value,"int_const", valueleft+1, valueright+1); :}
+          | DOUBLE_CONST:value {:RESULT = new constantExpression(value, "double_const", valueleft+1, valueright+1);:}
+          | CHAR_CONST:value {:RESULT = new constantExpression(value, "char_const", valueleft+1, valueright+1);:}
+          | STRING_CONST:value {:RESULT = new constantExpression(value, "string_const", valueleft+1, valueright+1);:}
+          ;
+
+
+DefDecl ::= DEF ID:id LPAR ParDecls:params RPAR OptType:type Body:bodyFun {: identifierExpression idFun = new identifierExpression(id, idleft + 1, idright + 1);;
+                                                                             RESULT = new DefDeclOp(idFun, params, type, bodyFun); :}
+        | DEF ID:id LPAR  RPAR OptType:type Body:bodyFun {: identifierExpression idFun = new identifierExpression(id, idleft + 1, idright + 1);
+                                                            ArrayList<ParDeclOp> params = new ArrayList<>();
+                                                           RESULT = new DefDeclOp(idFun, params, type, bodyFun); :}
+        ;
+
+ParDecls ::= ParDecl:par SEMI ParDecls:params {: params.add(0, par);
+                                                 RESULT = params; :}
+          | ParDecl:param {: ArrayList list = new ArrayList<ParDeclOp>();
+                            list.add(0, param);
+                            RESULT = list; :}
+          ;
+
+ParDecl ::= PVars:param COLON Type:type {: RESULT = new ParDeclOp(param, type); :}
+        ;
+
+PVars ::= PVar:var COMMA PVars:vars {: vars.add(0, var);
+                                      RESULT = vars; :}
+      | PVar:var {: ArrayList<PvarOp> vars = new ArrayList<PvarOp>();
+                   vars.add(0, var);
+                   RESULT = vars; :}
+      ;
+
+PVar ::= ID:id {: identifierExpression var = new identifierExpression(id, idleft + 1, idright + 1);
+                 RESULT = new PvarOp(var, null); :}
+        | REF ID:id {: identifierExpression var = new identifierExpression(id, idleft + 1, idright + 1);;
+                      RESULT = new PvarOp(var, "ref"); :}
+        ;
+
+
+OptType ::= COLON Type:type {: RESULT = type; :}
+         | {: RESULT = ""; :}
+         ;
+
+Body ::= LBRAC VarDecls:dich Statements:stats RBRAC {: RESULT = new BodyOp(stats, dich); :};
+
+Statements ::= Stat:state Statements:stats {: stats.add(0,state);
+                                             RESULT = stats; :}
+	   | {: RESULT = new ArrayList<statOp>(); :}
+	   ;
+
+
+Stat ::=  Vars:ins IN SEMI  {: RESULT = new ReadOp(ins); :}//ReadOp
+        | Exprs:outs OUT SEMI {: RESULT = new WriteOp(outs, null); :}//WriteOp
+        | Exprs:outs OUTNL SEMI {: RESULT = new WriteOp(outs, "\\n"); :}//WriteOpNL
+        | Vars:var ASSIGN Exprs:expr SEMI {: RESULT = new AssignOp(var, expr); :}//AssignOp
+	    | FunCallStat:node SEMI  {: RESULT = node; :} //CallOp
+        | IF LPAR Expr:cond RPAR THEN Body:btrue ELSE Body:bfalse {: RESULT = new ifThenElse(cond, btrue, bfalse); :}//ifelse
+        | IF LPAR Expr:expr RPAR THEN Body:body {: RESULT = new ifThenOp(expr,body); :} // ifthen
+        | WHILE LPAR Expr:expr RPAR DO Body:body {: RESULT = new whileOp(expr, body); :}//while
+	    | RETURN Expr:expr SEMI {: RESULT = new returnOp(expr); :}//return
+	    ;
+
+
+Vars  ::= ID:id PIPE Vars:args {: identifierExpression var = new identifierExpression(id, idleft + 1, idright + 1);;
+                                 args.add(0, var);
+                                 RESULT = args; :}
+        | ID:id {: ArrayList<identifierExpression> list = new ArrayList<identifierExpression>();
+                   identifierExpression var = new identifierExpression(id, idleft + 1, idright + 1);
+                   list.add(0, var);
+                   RESULT = list; :}
+        ;
+
+Exprs ::=  Expr:expr COMMA  Exprs:args {: args.add(0, expr);
+                                          RESULT = args; :}
+	| Expr:expr {: ArrayList<expressionNode> list = new ArrayList<expressionNode>();
+	               list.add(0, expr);
+	                RESULT = list; :}
+	;
+
+FunCallExpr ::= ID:id LPAR Exprs:args RPAR {: identifierExpression idFun = new identifierExpression(id, idleft +1, idright + 1);
+                                          RESULT = new CallOp(idFun,args, idleft + 1, idright + 1); :}
+        | ID:id LPAR RPAR {:ArrayList<expressionNode> args = new ArrayList<>();
+                            RESULT = new CallOp(new identifierExpression(id, idleft + 1, idright + 1), args, idleft + 1, idright +1); :}
+        ;
+
+
+FunCallStat ::= ID:id LPAR Exprs:args RPAR {: identifierExpression idFun = new identifierExpression(id, idleft + 1, idright + 1);
+                                          RESULT = new FunCallStat(idFun,args); :}
+        | ID:id LPAR RPAR {: ArrayList<expressionNode> args = new ArrayList<>();
+        RESULT = new FunCallStat(new identifierExpression(id, idleft + 1, idright + 1)
+        , args); :}
+        ;
+
+
+Expr ::= Expr:op1 ArithOp:operator Expr:op2 {: RESULT = new binaryExpression(operator, op1, op2, op1.getLine(), op1.getColumn()); :}
+		| Expr:op1 BoolOp:operator Expr:op2 {: RESULT = new binaryExpression(operator, op1, op2, op1.getLine(), op1.getColumn()); :}
+	    | Expr:op1 RelOp:operator Expr:op2 {: RESULT = new binaryExpression(operator, op1, op2, op1.getLine(), op1.getColumn()); :} %prec AND
+		| LPAR Expr:node RPAR {: RESULT = node; :}
+	    | MINUS Expr:node {: RESULT = new unaryExpression("-", node, node.getLine(), node.getColumn()); :} %prec UMINUS
+	    | NOT Expr:node {: RESULT = new unaryExpression("not", node, node.getLine(), node.getColumn()); :}
+	    | ID:value {: RESULT = new identifierExpression(value, valueleft + 1, valueright + 1);:}
+	    | FunCallExpr:node {: RESULT = node; :}
+		| Constant:node {: RESULT = node; :}
+		;
+
+ArithOp ::= PLUS {: RESULT = "+" ; :}
+            | MINUS  {: RESULT = "-"; :}
+            | TIMES  {: RESULT = "*"; :}
+            |  DIV   {: RESULT = "/"; :}
+            ;
+
+BoolOp ::= AND {: RESULT = "and"; :}
+          |  OR {: RESULT = "or"; :}
+          ;
+
+RelOp ::=   GT  {: RESULT = ">"; :}
+          | GE {: RESULT = ">="; :}
+          | LT {: RESULT = "<"; :}
+          | LE {: RESULT = "<="; :}
+          | EQ {: RESULT = "=="; :}
+          | NE {: RESULT ="<>"; :}
+          ;
