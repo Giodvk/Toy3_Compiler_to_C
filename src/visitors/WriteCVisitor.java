@@ -21,7 +21,7 @@ public class WriteCVisitor implements visitor {
 
     public WriteCVisitor() {
         try {
-            fileC = new FileWriter("compilers.c");
+            fileC = new FileWriter("my_compiler.c");
         } catch (IOException e) {
             System.err.println("Errore nella creazione del file: " + e.getMessage());
         }
