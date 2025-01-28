@@ -50,7 +50,7 @@ while (i > 0) do{
 	{
 		saluto :"byebye";
 		"Moltiplicazione " , i , ": inserisci due numeri positivi" !>>;
-		x & y <<;
+		x | y <<;
 		saluto !>>;
 	}
 
@@ -58,15 +58,15 @@ while (i > 0) do{
 	risultato !>>;
 
 	if(grande) then{
-		"il risultato  grande" !>>
+		"il risultato ï¿½ grande" !>>;
 		sommagrande := sommagrande + risultato;
 	}else{
-		"il risultato  piccolo" !>>
+		"il risultato ï¿½ piccolo" !>>;
 		sommapiccola := sommapiccola + risultato;
 	}
 	i := i-1;
 }
-	"\n sommagrande  ", sommagrande !>>;
-	"sommapiccola  ", sommapiccola !>>;
+	"\n sommagrande ï¿½ ", sommagrande !>>;
+	"sommapiccola ï¿½ ", sommapiccola !>>;
 
 end

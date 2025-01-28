@@ -1,6 +1,9 @@
+import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import classNode.main.ProgramOp;
 import java_cup.runtime.Symbol;
@@ -18,12 +21,30 @@ public class Main {
             System.exit(1);
         }
 
-        String inputFile = args[0];
+        String fullInputFilePath = args[0];
+
+        // Estrai solo il nome del file dal percorso completo
+        Path path = Paths.get(fullInputFilePath);
+        String inputFileName = path.getFileName().toString();  // Ottieni solo il nome del file (es. test1.txt)
+
+
+        // Percorso di output
+        String outputDirectory = "test_files"+ File.separator + "c_out"+ File.separator;
+
+        // Crea la cartella di output se non esiste
+        java.io.File outputDir = new java.io.File(outputDirectory);
+        if (!outputDir.exists()) {
+            outputDir.mkdirs();
+        }
+
+        String Cfile = inputFileName.replace(".txt", ".c");
+        // Costruisci il percorso completo di output
+        String outputFilePath = outputDirectory + Cfile;
 
         try {
             // Apri il file di input
-            System.out.println("Leggendo il file: " + inputFile);
-            FileReader fileReader = new FileReader(inputFile);
+            System.out.println("Leggendo il file: " + fullInputFilePath);
+            FileReader fileReader = new FileReader(fullInputFilePath);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
             // Crea il lexer passando il BufferedReader
@@ -40,13 +61,21 @@ public class Main {
             System.out.println("\n--- Albero Sintattico ---");
             PrintTreeVisitor printVisitor = new PrintTreeVisitor();
             program.accept(printVisitor);
+
+            // Esegui il controllo dei tipi
             TypeChecking typeChecking = new TypeChecking(program);
             program.accept(typeChecking);
-            WriteCVisitor writeCVisitor = new WriteCVisitor();
+
+
+            // Scrivi il risultato in un file C
+            WriteCVisitor writeCVisitor = new WriteCVisitor(outputFilePath);
             program.accept(writeCVisitor);
 
             // Chiudi il file
             bufferedReader.close();
+
+            // Log dell'output
+            System.out.println("Output salvato in: " + outputFilePath);
 
         } catch (IOException e) {
             System.err.println("Errore nella lettura del file: " + e.getMessage());
@@ -57,4 +86,3 @@ public class Main {
         }
     }
 }
-

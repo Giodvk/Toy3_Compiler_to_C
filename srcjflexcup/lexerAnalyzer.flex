@@ -122,8 +122,8 @@ charCostant = "'" {charAscii} "'"
 
 \"   { yybegin(YYINITIAL); return new Symbol(sym.STRING_CONST,yyline, yycolumn, string.toString()); }
 [^\n\r\"\\]+ { string.append( yytext() ); }
-\\t { string.append("\t"); }
-\\n { string.append("\n"); }
+\\t { string.append("\\t"); }
+\\n { string.append("\\n"); }
 \\r { string.append("\r"); }
 \\\" { string.append("\""); }
 \\ { string.append("\\"); }
@@ -133,7 +133,7 @@ charCostant = "'" {charAscii} "'"
 }
 
 <COMMENT> {
-{Comment} {/*ignore*/}
+{Comment} {/*ignore*/yybegin(YYINITIAL);}
 
 "eof" {System.err.println("Commento non chiuso, riga: "+yyline+", colonna: "+yycolumn);}
 }

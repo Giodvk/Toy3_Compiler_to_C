@@ -1072,7 +1072,7 @@ public class LexerAnalyzer implements java_cup.runtime.Scanner {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1:
-            { /*ignore*/
+            { /*ignore*/yybegin(YYINITIAL);
             }
             // fall through
           case 62: break;
@@ -1252,7 +1252,7 @@ public class LexerAnalyzer implements java_cup.runtime.Scanner {
             // fall through
           case 97: break;
           case 37:
-            { string.append("\n");
+            { string.append("\\n");
             }
             // fall through
           case 98: break;
@@ -1262,7 +1262,7 @@ public class LexerAnalyzer implements java_cup.runtime.Scanner {
             // fall through
           case 99: break;
           case 39:
-            { string.append("\t");
+            { string.append("\\t");
             }
             // fall through
           case 100: break;

@@ -1,0 +1,32 @@
+program
+
+boh : 10;
+
+def somma(a , b : int; ciao : string) : int{
+
+    return a + b;
+
+}
+
+def stampa(a, b : string) : string{
+
+    return a + b;
+
+}
+bello = "sono bello" + 1: string;
+
+
+begin
+x | y : int;
+a = "ciao" + "lollo" | c = "marco" + 1.001: string;
+x | y << ;
+somma(x, y, a + c);
+"Ciao" + "Bello" !>>;
+somma(x, y, a + c);
+boh := somma(x, y, a + c);
+a := a + x;
+"Il valore della somma è ", somma(x, y, a + c) !>>;
+a !>>;
+stampa(a, c);
+
+end

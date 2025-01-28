@@ -10,8 +10,9 @@ import java.util.List;
 
 public class FunCallStat extends statOp {
     private final identifierExpression idFun;
-    private List<expressionNode> args;
+    private final List<expressionNode> args;
     private ScopeTable funScope;
+    private String type;
 
     public FunCallStat(identifierExpression idFun, List<expressionNode> args) {
         this.idFun = idFun;
@@ -34,8 +35,13 @@ public class FunCallStat extends statOp {
         this.funScope = funScope;
     }
 
+    public String getType() {
+        return this.type;
+    }
 
-
+    public void setType(String type) {
+        this.type = type;
+    }
 
     @Override
     public void accept (visitor visitor) {

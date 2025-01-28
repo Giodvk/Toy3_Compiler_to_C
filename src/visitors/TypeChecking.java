@@ -21,6 +21,7 @@ import semanticAnalyzer.Symbols.VarEntry;
 
 public class TypeChecking implements visitor{
 
+    private String currentFun;
     private final binaryOperandTable binaryTable = new binaryOperandTable();
     private final unaryOperandTable unaryTable = new unaryOperandTable();
 
@@ -38,6 +39,10 @@ public class TypeChecking implements visitor{
             for (expressionNode expr : funCallStat.getArgs()) {
                 expr.accept(this);
                 String typeParam = types.getVars().get(i).getType();
+                if((expr.getType().equals("integer") && typeParam.equals("double")) || (expr.getType().equals("double") && typeParam.equals("integer"))){
+                    i++;
+                    continue;
+                }
                 if (!expr.getType().equals(typeParam)) {
                     throw new SemanticError(expr.getLine(), "Errore semantico: passato un valore " + expr.getType()
                             + " invece che " + typeParam, expr.getColumn());
@@ -53,6 +58,7 @@ public class TypeChecking implements visitor{
         } catch (SemanticError e) {
             System.err.println(e.getMessage());
         }
+        funCallStat.setType(types.getReturnType());
     }
 
     @Override
@@ -73,7 +79,7 @@ public class TypeChecking implements visitor{
     public void visit(returnOp returnStat) {
         returnStat.getExpr().accept(this);
         returnStat.setType(returnStat.getExpr().getType());
-        Symbol symbol = new Symbol("FUNCTION", returnStat.getReturnScope().getContext());
+        Symbol symbol = new Symbol("FUNCTION", currentFun);
         FunctionEntry Fun = (FunctionEntry) returnStat.getReturnScope().lookUpSymbol(symbol);
         String typeFun = Fun.getReturnType();
         if(typeFun.equals(" ")){
@@ -163,6 +169,7 @@ public class TypeChecking implements visitor{
 
     @Override
     public void visit(DefDeclOp function) {
+        currentFun = function.getFunName().getName();
         try {
             if (function.getType().equals(" ")) {
                 for (statOp stat : function.getBodyFun().getStatement()) {
@@ -220,6 +227,14 @@ public class TypeChecking implements visitor{
                 id.accept(this);
                 expressionNode expr = assignOp.getExpression().get(i);
                 expr.accept(this);
+                if(id.getType().equals("double") && expr.getType().equals("integer")){
+                    System.out.println("Cast da intero a double");
+                    continue;
+                }
+                if(id.getType().equals("integer") && expr.getType().equals("double")){
+                    System.out.println("Cast da double a integer");
+                    continue;
+                }
                 if (!id.getType().equals(expr.getType())) {
                     throw new SemanticError(expr.getLine(), "Errore semantico: assegnazione di un "
                             + expr.getType() + " ad un tipo " + id.getType() , expr.getColumn());

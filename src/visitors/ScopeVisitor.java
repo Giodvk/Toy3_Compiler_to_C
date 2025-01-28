@@ -133,7 +133,8 @@ public class ScopeVisitor implements visitor {
 
     @Override
     public void visit (PvarOp pvarOp) {
-
+        pvarOp.getVar().accept(this);
+        pvarOp.setScopeTable(currentScope);
     }
 
     @Override
@@ -141,12 +142,12 @@ public class ScopeVisitor implements visitor {
         try {
             for (varOptInitOp var : varDeclOp.getVarOptInits()) {
                 String type;
-                if (varDeclOp.getType() instanceof String || varDeclOp.getType().equals("string")) {
+                if (typesDecl(varDeclOp.getType().toString()) != null) {
                     type = varDeclOp.getType().toString().trim();
                 } else if (varDeclOp.getVarOptInits().size() == 1 && varDeclOp.getVarOptInits().get(0).getExpression() == null) {
                     type = varDeclOp.getType().getClass().getSimpleName().toLowerCase();
                 } else {
-                    throw new SemanticError(var.getIdentifier().getLine(),"Errore semantico: inizializzazione" +
+                    throw new SemanticError(var.getIdentifier().getLine(),"Errore semantico: inizializzazione " +
                             " variabile "+ var.getIdentifier().getName() + "non effettuata correttamente", var.getIdentifier().getColumn());
                 }
                 Symbol variable = new Symbol("VAR", var.getIdentifier().getName());
@@ -362,6 +363,16 @@ public class ScopeVisitor implements visitor {
             types.add(expr.getClass());
         }
         return types;
+    }
+
+    private String typesDecl(String type){
+        return switch (type) {
+            case "integer" -> "integer";
+            case "double" -> "double";
+            case "bool" -> "bool";
+            case "string" -> "string";
+            default -> null;
+        };
     }
 
 

@@ -24,6 +24,10 @@ public class binaryOperandTable
             this.table.put(key4, "double");
         }
         this.table.put(new Triple<>("+","string","string"),"string");
+        this.table.put(new Triple<>("+","string","integer"),"string");
+        this.table.put(new Triple<>("+","integer","string"),"string");
+        this.table.put(new Triple<>("+","double","string"),"string");
+        this.table.put(new Triple<>("+","string","double"),"string");
         operators = new String[6];
         operators[0] = "<";
         operators[1] = ">";
@@ -37,10 +41,12 @@ public class binaryOperandTable
             Triple<String,String,String> key2 = new Triple<>(operators[i],"integer", "double");
             Triple<String,String,String> key3 = new Triple<>(operators[i],"double", "integer");
             Triple<String,String,String> key4 = new Triple<>(operators[i],"double", "double");
+            Triple<String,String,String> key5 = new Triple<>(operators[i],"string", "string");
             this.table.put(key1, "bool");
             this.table.put(key2, "bool");
             this.table.put(key3, "bool");
             this.table.put(key4, "bool");
+            this.table.put(key5, "bool");
         }
         this.table.put(new Triple<>("and","bool","bool"),"bool");
         this.table.put(new Triple<>("or","bool","bool"),"bool");
