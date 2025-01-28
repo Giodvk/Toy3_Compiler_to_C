@@ -24,7 +24,6 @@ public class WriteCVisitor implements visitor {
     private int maxBuffer = 1;
     private int currentBuffer = 1; //contatore buffer
     public WriteCVisitor(String nomeFile) {
-
         try {
             fileC = new FileWriter(nomeFile);
         } catch (IOException e) {
@@ -164,7 +163,7 @@ public class WriteCVisitor implements visitor {
                     this.write("%s ");
                     break;
                 case "double":
-                    this.write("%lf ");
+                    this.write("%.2lf ");
                     break;
                 case "char":
                     this.write("%c ");
@@ -255,11 +254,18 @@ public class WriteCVisitor implements visitor {
             type = "char ";
             this.write(type);
             setPointer(varDeclOp.getVarOptInits());
+            if(varDeclOp.getVarOptInits().size() == 1 && typesDecl(varDeclOp.getType().toString()) == null){
+                varOptInitOp var = varDeclOp.getVarOptInits().get(0);
+                var.getIdentifier().accept(this);
+                this.write(";\n");
+                var.setExpression(new constantExpression(varDeclOp.getType(), "string_const", var.getIdentifier().getLine(), var.getIdentifier().getColumn()));
+                var.getExpression().setType("string");
+                return;
+            }
         } else if (type.equals("string ")) {
             type = "char ";
             this.write(type);
             setPointer(varDeclOp.getVarOptInits());
-            allocateMemory(varDeclOp.getVarOptInits());
             if(varDeclOp.getVarOptInits().size() == 1 && typesDecl(varDeclOp.getType().toString()) == null){
                 varOptInitOp var = varDeclOp.getVarOptInits().get(0);
                 var.getIdentifier().accept(this);
@@ -268,6 +274,8 @@ public class WriteCVisitor implements visitor {
                 var.getIdentifier().accept(this);
                 this.write(", \"" + varDeclOp.getType().toString()+ "\\0\");\n");
                 return;
+            }else {
+                allocateMemory(varDeclOp.getVarOptInits());
             }
         }else {
             this.write(type);
@@ -326,6 +334,12 @@ public class WriteCVisitor implements visitor {
             expressionNode expr = assignOp.getExpression().get(i);
             if(id.getType().equals("string")){
                 if(expr instanceof identifierExpression || expr instanceof constantExpression || expr instanceof CallOp){
+                    id.accept(this);
+                    this.write(" = (char*) realloc(");
+                    id.accept(this);
+                    this.write(", sizeof(char) * ");
+                    generateLengthExpression(expr);
+                    this.write(" + 1);\n");
                     this.write("strcpy(");
                     id.accept(this);
                     this.write(", ");
@@ -333,7 +347,10 @@ public class WriteCVisitor implements visitor {
                     this.write(")");
                 }else {
                     expr.accept(this);
-                    this.write(id.getName() + " = (char*)realloc("+ id.getName() +",strlen(tempBuffer) + 1);\n");
+                    id.accept(this);
+                    this.write(" = (char*)realloc(");
+                    id.accept(this);
+                    this.write(", sizeof(char) * (strlen(tempBuffer) + 1));\n");
                     this.write("strcpy("+id.getName()+", tempBuffer);\n");
                     this.write("free(tempBuffer)");
                 }

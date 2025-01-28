@@ -7,7 +7,7 @@ import visitors.visitor;
 
 public class varOptInitOp extends DeclOp{
     private final identifierExpression identifier;
-    private final expressionNode expression;
+    private expressionNode expression;
     private ScopeTable scopeTable;
 
     public varOptInitOp(identifierExpression identifier, expressionNode expression){
@@ -21,6 +21,10 @@ public class varOptInitOp extends DeclOp{
 
     public expressionNode getExpression(){
         return this.expression;
+    }
+
+    public void setExpression(expressionNode expression){
+        this.expression = expression;
     }
 
     public ScopeTable getScopeTable(){
