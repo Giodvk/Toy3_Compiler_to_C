@@ -67,7 +67,7 @@ public class ScopeVisitor implements visitor {
         scopeTables.pop();
         currentScope = null;
         if(scopeTables.size() == 0){
-            System.out.println("Analisi dello scoping conclusa corretamente");
+            //System.out.println("Analisi dello scoping conclusa corretamente");
         }
     }
 

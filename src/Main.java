@@ -34,7 +34,8 @@ public class Main {
         // Crea la cartella di output se non esiste
         java.io.File outputDir = new java.io.File(outputDirectory);
         if (!outputDir.exists()) {
-            outputDir.mkdirs();
+            boolean flag = outputDir.mkdirs();
+            System.out.println("Cartella creata: "+flag);
         }
 
         String Cfile = inputFileName.replace(".txt", ".c");
@@ -43,7 +44,7 @@ public class Main {
 
         try {
             // Apri il file di input
-            System.out.println("Leggendo il file: " + fullInputFilePath);
+            //System.out.println("Leggendo il file: " + fullInputFilePath);
             FileReader fileReader = new FileReader(fullInputFilePath);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
@@ -58,9 +59,9 @@ public class Main {
             ProgramOp program = (ProgramOp) result.value;
 
             // Stampa l'albero sintattico utilizzando PrintVisitor
-            System.out.println("\n--- Albero Sintattico ---");
-            PrintTreeVisitor printVisitor = new PrintTreeVisitor();
-            program.accept(printVisitor);
+            //System.out.println("\n--- Albero Sintattico ---");
+            //PrintTreeVisitor printVisitor = new PrintTreeVisitor();
+            //program.accept(printVisitor);
 
             // Esegui il controllo dei tipi
             TypeChecking typeChecking = new TypeChecking(program);
@@ -75,7 +76,7 @@ public class Main {
             bufferedReader.close();
 
             // Log dell'output
-            System.out.println("Output salvato in: " + outputFilePath);
+            //System.out.println("Output salvato in: " + outputFilePath);
 
         } catch (IOException e) {
             System.err.println("Errore nella lettura del file: " + e.getMessage());

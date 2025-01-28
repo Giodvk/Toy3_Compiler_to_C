@@ -228,11 +228,11 @@ public class TypeChecking implements visitor{
                 expressionNode expr = assignOp.getExpression().get(i);
                 expr.accept(this);
                 if(id.getType().equals("double") && expr.getType().equals("integer")){
-                    System.out.println("Cast da intero a double");
+                    //System.out.println("Cast da intero a double");
                     continue;
                 }
                 if(id.getType().equals("integer") && expr.getType().equals("double")){
-                    System.out.println("Cast da double a integer");
+                    //System.out.println("Cast da double a integer");
                     continue;
                 }
                 if (!id.getType().equals(expr.getType())) {
