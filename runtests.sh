@@ -9,6 +9,8 @@ fi
 
 RESULT=0
 
+cd "$CI_PROJECT_DIR"
+
 OUTPUTDIR="test_files/c_out"
 mkdir -p $OUTPUTDIR
 
