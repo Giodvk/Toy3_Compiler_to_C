@@ -72,9 +72,9 @@
                     <cupDefinition>srcjflexcup/SintaxAnalyzer.cup</cupDefinition>
                     <outputDirectory>src</outputDirectory>
                     <packageName>esercitazione4</packageName>
-                    <dumpGrammar>${miaCondizione}</dumpGrammar>
-                    <dumpStates>${miaCondizione}</dumpStates>
-                    <dumpTables>${miaCondizione}</dumpTables>
+                    <dumpGrammar>false</dumpGrammar>
+                    <dumpStates>false</dumpStates>
+                    <dumpTables>false</dumpTables>
                     <expectedConflicts>0</expectedConflicts>
                 </configuration>
             </plugin>
