@@ -1,15 +1,15 @@
+package Esercitazione5_TCS;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import classNode.main.ProgramOp;
 import java_cup.runtime.Symbol;
 import esercitazione4.*;
 import visitors.PrintTreeVisitor;
-import visitors.ScopeVisitor;
 import visitors.TypeChecking;
 import visitors.WriteCVisitor;
 
