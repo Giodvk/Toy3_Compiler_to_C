@@ -57,6 +57,7 @@ public class TypeChecking implements visitor{
             }
         } catch (SemanticError e) {
             System.err.println(e.getMessage());
+            System.exit(1);
         }
         funCallStat.setType(types.getReturnType());
     }
@@ -92,6 +93,7 @@ public class TypeChecking implements visitor{
             }
         }catch (SemanticError e){
             System.err.println(e.getMessage());
+            System.exit(1);
         }
     }
 
@@ -105,6 +107,7 @@ public class TypeChecking implements visitor{
             }
         }catch (SemanticError e){
            System.err.println(e.getMessage());
+           System.exit(1);
         }
         ifThenOp.getBodyIf().accept(this);
     }
@@ -120,6 +123,7 @@ public class TypeChecking implements visitor{
             }
         }catch(SemanticError e){
             System.err.println(e.getMessage());
+            System.exit(1);
         }
         ifThenElse.getBodyIf().accept(this);
         ifThenElse.getBodyElse().accept(this);
@@ -135,6 +139,7 @@ public class TypeChecking implements visitor{
             }
         } catch (SemanticError e) {
             System.err.println(e.getMessage());
+            System.exit(1);
         }
         whileOp.getBodyWhile().accept(this);
     }
@@ -181,7 +186,7 @@ public class TypeChecking implements visitor{
             }
         }catch (SemanticError e){
             System.err.println(e.getMessage());
-
+            System.exit(1);
         }
         function.getBodyFun().accept(this);
     }
@@ -216,6 +221,7 @@ public class TypeChecking implements visitor{
             }
         }catch (SemanticError e){
             System.err.println(e.getMessage());
+            System.exit(1);
         }
     }
 
@@ -242,6 +248,7 @@ public class TypeChecking implements visitor{
             }
         }catch (SemanticError e){
             System.err.println(e.getMessage());
+            System.exit(1);
         }
     }
 
@@ -268,6 +275,7 @@ public class TypeChecking implements visitor{
             }
         } catch (SemanticError e) {
             System.err.println(e.getMessage());
+            System.exit(1);
         }
         if(types.getReturnType().isEmpty()) {
             callOp.setType("void");
@@ -294,6 +302,7 @@ public class TypeChecking implements visitor{
             }
         }catch (SemanticError e){
             System.err.println(e.getMessage());
+            System.exit(1);
         }
     }
 
@@ -311,7 +320,7 @@ public class TypeChecking implements visitor{
             }
         }catch(SemanticError e){
             System.err.println(e.getMessage());
-
+            System.exit(1);
         }
     }
 
