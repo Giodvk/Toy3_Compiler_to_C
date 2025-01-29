@@ -9,6 +9,8 @@ fi
 
 RESULT=0
 
+cd "$CI_PROJECT_DIR"
+
 OUTPUTDIR="test_files/c_out"
 mkdir -p $OUTPUTDIR
 
@@ -41,7 +43,7 @@ do
 			echo diff -w "${TESTIN/_in/_out}" $TESTOUT >> $1.report.txt
 			diff -w "${TESTIN/_in/_out}" $TESTOUT >> $1.report.txt
 		done
-	else 
+	else
 		echo "$OUTPUTDIR/$TESTNAME.c non esiste" >> $1.report.txt
 		if [[ $TESTNAME != *invalid* ]]; then
 			RESULT=1
