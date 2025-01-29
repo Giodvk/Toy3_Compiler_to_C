@@ -38,6 +38,7 @@ def stampa(messaggio: string): string
 }
 
 begin
+    c :="ciao";
     a := 1;
     b := 2.2;
     x := 3;
