@@ -17,12 +17,15 @@ import semanticAnalyzer.Symbols.Symbol;
 import semanticAnalyzer.Symbols.VarEntry;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 public class WriteCVisitor implements visitor {
     private FileWriter fileC;
+    private String actualFun;
     private int maxBuffer = 1;
     private int currentBuffer = 1; //contatore buffer
+    private Hashtable<String, Boolean> releaseTempBuffer = new Hashtable();
     public WriteCVisitor(String nomeFile) {
         try {
             fileC = new FileWriter(nomeFile);
@@ -88,6 +91,7 @@ public class WriteCVisitor implements visitor {
 
     @Override
     public void visit(DefDeclOp defDeclOp) {
+        actualFun = defDeclOp.getFunName().getName();
         if(defDeclOp.getType().equals("string")){
             this.write("char* " + defDeclOp.getFunName().getName() + "(");
         }else if(defDeclOp.getType().equals("bool") || defDeclOp.getType().equals("integer")){
@@ -211,11 +215,21 @@ public class WriteCVisitor implements visitor {
                 this.write(");\n");
                 this.write("getchar();\n");
             }else{
+                id.accept(this);
+                this.write(" = (char*) realloc(");
+                id.accept(this);
+                this.write(", sizeof(char) * 1001);\n");
                 this.write("fgets("+id.getName()+", 1000, stdin);\n");
                 id.accept(this);
                 this.write("[strcspn(");
                 id.accept(this);
                 this.write(", \"\\n\")] = '\\0';\n");
+                id.accept(this);
+                this.write(" = (char*) realloc(");
+                id.accept(this);
+                this.write(", sizeof(char) * strlen(");
+                id.accept(this);
+                this.write("));\n");
             }
         }
     }
@@ -345,6 +359,11 @@ public class WriteCVisitor implements visitor {
                     this.write(", ");
                     expr.accept(this);
                     this.write(")");
+                    if(expr instanceof CallOp){
+                        if(releaseTempBuffer.contains(((CallOp) expr).getIdFun().getName())){
+                            this.write(";\nfree(tempBuffer)");
+                        }
+                    }
                 }else {
                     expr.accept(this);
                     id.accept(this);
@@ -419,7 +438,9 @@ public class WriteCVisitor implements visitor {
             discardMemoryFun();
         }
         if(funCallStat.getType().equals("string")){
-            this.write("free(tempBuffer);\n");
+            if(releaseTempBuffer.containsKey(funCallStat.getIdFun().getName())){
+                this.write("free(tempBuffer);\n");
+            }
         }
     }
 
@@ -428,6 +449,7 @@ public class WriteCVisitor implements visitor {
         if(returnOp.getExpr().getType().equals("string") && returnOp.getExpr() instanceof binaryExpression){
             returnOp.getExpr().accept(this);
             this.write("return tempBuffer;\n");
+            releaseTempBuffer.put(actualFun,true);
         }else {
             this.write("return ");
             returnOp.getExpr().accept(this);
