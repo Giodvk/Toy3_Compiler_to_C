@@ -6,10 +6,7 @@ import classNode.Stat.*;
 import classNode.jumpStatement.ifThenElse;
 import classNode.jumpStatement.ifThenOp;
 import classNode.jumpStatement.whileOp;
-import classNode.main.BeginEndOp;
-import classNode.main.BodyOp;
-import classNode.main.ProgramOp;
-import classNode.main.statOp;
+import classNode.main.*;
 import semanticAnalyzer.ScopeStack;
 import semanticAnalyzer.ScopeTable;
 import semanticAnalyzer.SemanticError;
@@ -357,6 +354,32 @@ public class ScopeVisitor implements visitor {
         unary.setScopeTable(currentScope);
     }
 
+
+    @Override
+    public void visit(CaseOp caseOp) {
+        caseOp.getConstant().accept(this);
+        for(statOp stat: caseOp.getStatements()){
+            stat.accept(this);
+        }
+        caseOp.setCaseScope(currentScope);
+    }
+
+    @Override
+    public void visit(BodySwitchOp bodySwitchOp) {
+        for(CaseOp caseOp: bodySwitchOp.getCases()){
+            caseOp.accept(this);
+        }
+        bodySwitchOp.setBodyScope(currentScope);
+    }
+
+    @Override
+    public void visit(SwitchOp switchOp) {
+        switchOp.getVariable().accept(this);
+        switchOp.getBodySwitchOp().accept(this);
+
+        switchOp.setSwitchTable(currentScope);
+    }
+
     private List<Object> getTypes(List<expressionNode> exprs){
         List<Object> types = new ArrayList<>();
         for (expressionNode expr : exprs){
@@ -371,6 +394,7 @@ public class ScopeVisitor implements visitor {
             case "double" -> "double";
             case "bool" -> "bool";
             case "string" -> "string";
+            case "char" -> "char";
             default -> null;
         };
     }

@@ -6,10 +6,7 @@ import classNode.Stat.*;
 import classNode.jumpStatement.ifThenElse;
 import classNode.jumpStatement.ifThenOp;
 import classNode.jumpStatement.whileOp;
-import classNode.main.BeginEndOp;
-import classNode.main.BodyOp;
-import classNode.main.ProgramOp;
-import classNode.main.statOp;
+import classNode.main.*;
 
 public class PrintTreeVisitor implements visitor{
     private int indent = 0;
@@ -253,6 +250,38 @@ public class PrintTreeVisitor implements visitor{
         for (expressionNode expr : call.getArgs()){
             expr.accept(this);
         }
+        indent -= 1;
+    }
+
+    @Override
+    public void visit(CaseOp caseOp){
+        printIndent();
+        System.out.println("caseOp");
+        indent += 1;
+        caseOp.getConstant().accept(this);
+        for(statOp stat : caseOp.getStatements()){
+            stat.accept(this);
+        }
+        indent -= 1;
+    }
+
+    @Override
+    public void visit(BodySwitchOp bodySwitch){
+        printIndent();
+        System.out.println("bodySwitch");
+        indent += 1;
+        for(CaseOp cond : bodySwitch.getCases()){
+            cond.accept(this);
+        }
+    }
+
+    @Override
+    public void visit(SwitchOp switchOp){
+        printIndent();
+        System.out.println("switchOp");
+        indent += 1;
+        switchOp.getVariable().accept(this);
+        switchOp.getBodySwitchOp().accept(this);
         indent -= 1;
     }
 

@@ -6,10 +6,7 @@ import classNode.Stat.*;
 import classNode.jumpStatement.ifThenElse;
 import classNode.jumpStatement.ifThenOp;
 import classNode.jumpStatement.whileOp;
-import classNode.main.BeginEndOp;
-import classNode.main.BodyOp;
-import classNode.main.ProgramOp;
-import classNode.main.statOp;
+import classNode.main.*;
 import semanticAnalyzer.OperandTable.Triple;
 import semanticAnalyzer.OperandTable.binaryOperandTable;
 import semanticAnalyzer.OperandTable.unaryOperandTable;
@@ -18,6 +15,8 @@ import semanticAnalyzer.Symbols.EntryTable;
 import semanticAnalyzer.Symbols.FunctionEntry;
 import semanticAnalyzer.Symbols.Symbol;
 import semanticAnalyzer.Symbols.VarEntry;
+
+import java.util.List;
 
 public class TypeChecking implements visitor{
 
@@ -362,6 +361,41 @@ public class TypeChecking implements visitor{
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    public void visit(CaseOp caseOp) {
+        caseOp.getConstant().accept(this);
+        for(statOp statOp : caseOp.getStatements()){
+            statOp.accept(this);
+        }
+    }
+
+    @Override
+    public void visit(BodySwitchOp bodySwitchOp){
+        for(CaseOp caseOp : bodySwitchOp.getCases()){
+            caseOp.accept(this);
+        }
+    }
+
+    @Override
+    public void visit(SwitchOp switchOp){
+        switchOp.getVariable().accept(this);
+        switchOp.getBodySwitchOp().accept(this);
+        List<CaseOp> cases = switchOp.getBodySwitchOp().getCases();
+        try{
+            for(CaseOp caseOp : cases){
+                if(!switchOp.getVariable().getType().equals(caseOp.getConstant().getType())){
+                    throw new SemanticError(caseOp.getConstant().getLine(),
+                            "Errore semantico : type mismatch, la costante " +
+                            caseOp.getConstant().getConstant().toString() + " non è di tipo "+ switchOp.getVariable().getType(),
+                            caseOp.getConstant().getColumn());
+                }
+            }
+        }catch (SemanticError e){
+            System.err.println(e.getMessage());
+            System.exit(1);
         }
     }
 }

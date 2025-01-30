@@ -6,9 +6,7 @@ import classNode.Stat.*;
 import classNode.jumpStatement.ifThenElse;
 import classNode.jumpStatement.ifThenOp;
 import classNode.jumpStatement.whileOp;
-import classNode.main.BeginEndOp;
-import classNode.main.BodyOp;
-import classNode.main.ProgramOp;
+import classNode.main.*;
 
 public interface visitor {
     void visit (ProgramOp program);
@@ -32,4 +30,7 @@ public interface visitor {
     void visit (constantExpression constant);
     void visit (identifierExpression id);
     void visit (unaryExpression unary);
+    void visit(SwitchOp switchOp);
+    void visit(BodySwitchOp bodySwitchOp);
+    void visit(CaseOp caseOp);
 }

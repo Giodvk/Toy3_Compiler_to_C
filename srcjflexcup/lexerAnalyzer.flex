@@ -54,6 +54,8 @@ charCostant = "'" {charAscii} "'"
     "else" {return new Symbol(sym.ELSE, yyline, yycolumn);}
     "ref" {return new Symbol(sym.REF, yyline, yycolumn);}
     "def" {return new Symbol(sym.DEF, yyline, yycolumn);}
+    "switch" {return new Symbol(sym.SWITCH, yyline, yycolumn);}
+    "stop" {return new Symbol(sym.STOP, yyline, yycolumn);}
     "<<" {return new Symbol(sym.IN, yyline, yycolumn);}
     ">>" {return new Symbol(sym.OUT, yyline, yycolumn);}
     "!>>" {return new Symbol(sym.OUTNL, yyline, yycolumn);}
@@ -93,7 +95,7 @@ charCostant = "'" {charAscii} "'"
     {double} {return new Symbol(sym.DOUBLE_CONST, yyline, yycolumn, Double.parseDouble(yytext()));}
 
      //Costanti dei char
-    {charCostant} {return new Symbol(sym.CHAR_CONST, yyline, yycolumn, yytext());}
+    {charCostant} {return new Symbol(sym.CHAR_CONST, yyline, yycolumn, yytext().charAt(1));}
 
     //Costanti booleani
     "true" {return new Symbol(sym.TRUE, yyline, yycolumn,Boolean.parseBoolean(yytext()));}

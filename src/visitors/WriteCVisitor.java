@@ -5,10 +5,7 @@ import classNode.Stat.*;
 import classNode.jumpStatement.ifThenElse;
 import classNode.jumpStatement.ifThenOp;
 import classNode.jumpStatement.whileOp;
-import classNode.main.BeginEndOp;
-import classNode.main.BodyOp;
-import classNode.main.ProgramOp;
-import classNode.main.statOp;
+import classNode.main.*;
 import semanticAnalyzer.ScopeStack;
 import semanticAnalyzer.ScopeTable;
 import semanticAnalyzer.Symbols.EntryTable;
@@ -564,6 +561,33 @@ public class WriteCVisitor implements visitor {
         }
     }
 
+    @Override
+    public void visit(CaseOp caseOp) {
+        this.write("case ");
+        caseOp.getConstant().accept(this);
+        this.write(": ");
+        for(statOp statOp : caseOp.getStatements()){
+            statOp.accept(this);
+        }
+        this.write("break;\n");
+    }
+
+    @Override
+    public void visit(BodySwitchOp bodySwitchOp) {
+        for(CaseOp cond : bodySwitchOp.getCases()){
+            cond.accept(this);
+        }
+    }
+
+    @Override
+    public void visit(SwitchOp switchOp) {
+        this.write("switch(");
+        switchOp.getVariable().accept(this);
+        this.write(") {\n");
+        switchOp.getBodySwitchOp().accept(this);
+        this.write("}\n");
+    }
+
     public void write(String s) {
         try {
             fileC.write(s);
@@ -721,6 +745,7 @@ public class WriteCVisitor implements visitor {
             case "double" -> "double";
             case "bool" -> "bool";
             case "string" -> "string";
+            case "char" -> "char";
             default -> null;
         };
     }

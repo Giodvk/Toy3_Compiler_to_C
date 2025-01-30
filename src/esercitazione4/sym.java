@@ -8,12 +8,12 @@ package esercitazione4;
 /** CUP generated interface containing symbol constants. */
 public interface sym {
   /* terminals */
-  public static final int CHAR_CONST = 52;
+  public static final int CHAR_CONST = 54;
   public static final int ASSIGNDECL = 28;
   public static final int CHAR = 11;
   public static final int GE = 35;
   public static final int UMINUS = 23;
-  public static final int DOUBLE_CONST = 49;
+  public static final int DOUBLE_CONST = 51;
   public static final int DOUBLE = 9;
   public static final int SEMI = 5;
   public static final int UAND = 45;
@@ -36,19 +36,21 @@ public interface sym {
   public static final int PLUS = 21;
   public static final int ASSIGN = 27;
   public static final int IF = 29;
-  public static final int ID = 46;
+  public static final int ID = 48;
   public static final int LE = 37;
   public static final int EOF = 0;
   public static final int RETURN = 26;
-  public static final int TRUE = 50;
-  public static final int INT_CONST = 48;
+  public static final int TRUE = 52;
+  public static final int INT_CONST = 50;
   public static final int error = 1;
   public static final int PROGRAM = 2;
   public static final int PIPE = 44;
   public static final int EQ = 38;
+  public static final int SWITCH = 46;
   public static final int TIMES = 24;
   public static final int COLON = 6;
   public static final int ELSE = 33;
+  public static final int STOP = 47;
   public static final int WHILE = 31;
   public static final int THEN = 30;
   public static final int NE = 39;
@@ -57,8 +59,8 @@ public interface sym {
   public static final int STRING = 10;
   public static final int DEF = 13;
   public static final int LBRAC = 16;
-  public static final int FALSE = 51;
-  public static final int STRING_CONST = 47;
+  public static final int FALSE = 53;
+  public static final int STRING_CONST = 49;
   public static final int GT = 34;
   public static final int DO = 32;
   public static final String[] terminalNames = new String[] {
@@ -108,6 +110,8 @@ public interface sym {
   "REF",
   "PIPE",
   "UAND",
+  "SWITCH",
+  "STOP",
   "ID",
   "STRING_CONST",
   "INT_CONST",

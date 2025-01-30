@@ -20,7 +20,7 @@ parser code {:
 terminal PROGRAM, BEGIN, END, SEMI, COLON, INT, BOOL, DOUBLE, STRING, CHAR,
          COMMA, DEF, LPAR, RPAR, LBRAC, RBRAC, IN, OUT, OUTNL, PLUS, MINUS,
          UMINUS, TIMES, DIV, RETURN, ASSIGN, ASSIGNDECL, IF, THEN, WHILE, DO, ELSE, GT,
-         GE, LT, LE, EQ, NE, AND, OR, NOT, REF, PIPE, UAND;
+         GE, LT, LE, EQ, NE, AND, OR, NOT, REF, PIPE, UAND, SWITCH, STOP;
 
 terminal String ID, STRING_CONST;
 terminal int INT_CONST;
@@ -29,6 +29,9 @@ terminal boolean TRUE, FALSE;
 terminal char CHAR_CONST;
 
 nonterminal Object TypeOrConstant;
+nonterminal CaseOp Case;
+nonterminal ArrayList<CaseOp> Cases;
+nonterminal BodySwitchOp BodySwitch;
 nonterminal expressionNode Expr, FunCallExpr;
 nonterminal constantExpression Constant;
 nonterminal String ArithOp, BoolOp, RelOp, Type, OptType;
@@ -164,6 +167,19 @@ OptType ::= COLON Type:type {: RESULT = type; :}
 
 Body ::= LBRAC VarDecls:dich Statements:stats RBRAC {: RESULT = new BodyOp(stats, dich); :};
 
+BodySwitch ::= Cases:values {: RESULT = new BodySwitchOp(values); :};
+
+Cases ::= Cases:values Case:value {: values.add(value);
+                                    RESULT = values; :}
+         | Case:value1 Case:value2 Case:value3 {: ArrayList<CaseOp> cases = new ArrayList<>();
+                         cases.add(value1);
+                         cases.add(value2);
+                         cases.add(value3);
+                         RESULT = cases; :};
+
+Case ::= Constant:node COLON Statements:stast STOP SEMI{: RESULT = new CaseOp(node, stast); :}
+        ;
+
 Statements ::= Stat:state Statements:stats {: stats.add(0,state);
                                              RESULT = stats; :}
 	   | {: RESULT = new ArrayList<statOp>(); :}
@@ -179,6 +195,8 @@ Stat ::=  Vars:ins IN SEMI  {: RESULT = new ReadOp(ins); :}//ReadOp
         | IF LPAR Expr:expr RPAR THEN Body:body {: RESULT = new ifThenOp(expr,body); :} // ifthen
         | WHILE LPAR Expr:expr RPAR DO Body:body {: RESULT = new whileOp(expr, body); :}//while
 	    | RETURN Expr:expr SEMI {: RESULT = new returnOp(expr); :}//return
+	    | SWITCH LPAR ID:value RPAR BodySwitch:body END SWITCH SEMI {: identifierExpression id = new identifierExpression(value, valueleft+1, valueright+1);
+	                                                             RESULT = new SwitchOp(id, body); :}
 	    ;
 
 

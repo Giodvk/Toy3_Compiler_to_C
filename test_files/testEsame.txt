@@ -1,0 +1,15 @@
+program
+
+begin
+
+i : int;
+a : 1;
+b : 2;
+
+switch(i)
+    1 : a * 4 !>>; a := a + 1; stop;
+    4 : a := b + 3; stop;
+    3 : 3 !>>; stop;
+end switch;
+
+end
